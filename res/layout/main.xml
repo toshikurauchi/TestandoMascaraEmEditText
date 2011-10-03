@@ -12,4 +12,10 @@
     custom_edit:char_representation="c"
 	android:id="@+id/edit"
     />
+<br.com.sapereaude.teste.MaskedEditText
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    custom_edit:mask="###.###.###-##"
+	android:id="@+id/edit"
+    />
 </LinearLayout>

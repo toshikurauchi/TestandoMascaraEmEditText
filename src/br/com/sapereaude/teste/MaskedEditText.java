@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.EditText;
 
 public class MaskedEditText extends EditText implements TextWatcher {
@@ -52,6 +53,15 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		this.setText(mask.replace(charRepresentation, ' '));
 		ignore = false;
 		initialized = true;
+		
+		setOnFocusChangeListener(new OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if(hasFocus()) {
+					MaskedEditText.this.setSelection(nextValidPosition(rawToMasked[rawText.length()]));
+				}
+			}
+		});
 	}
 
 	private void generatePositionArrays() {
@@ -73,6 +83,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 				}
 				maskedToRaw[i] = -1;
 			}
+		}
+		if(charsInMaskAux.indexOf(' ') < 0) {
+			charsInMaskAux = charsInMaskAux + " ";
 		}
 		charsInMask = charsInMaskAux.toCharArray();
 		
