@@ -20,6 +20,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	private char[] charsInMask;
 	private int selection;
 	private boolean initialized;
+	private boolean ignore;
 	
 //	public MaskedEditText(Context context) {
 //		super(context);
@@ -47,17 +48,10 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		generatePositionArrays();
 		
 		rawText = "";
-//		completeWithWhitespaces("", mask.length());
 		selection = rawToMasked[0];
 		this.setText(mask.replace(charRepresentation, ' '));
+		ignore = false;
 		initialized = true;
-	}
-
-	private String completeWithWhitespaces(String string, int size) {
-		while(string.length() < size) {
-			string = string.concat(" ");
-		}
-		return string;
 	}
 
 	private void generatePositionArrays() {
@@ -100,6 +94,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			int after) {
 		if(!editingBefore) {
 			editingBefore = true;
+			if(start >= mask.length()) {
+				ignore = true;
+			}
 			StringRange range = calculateRange(start, start + count);
 			if(range.getStart() != -1) {
 				rawText = range.subtractFromString(rawText);
@@ -111,6 +108,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		if(!editingOnChanged && editingBefore) {
 			editingOnChanged = true;
+			if(ignore) {
+				return;
+			}
 			if(count > 0) {
 				StringRange range = new StringRange();
 				range.setStart(maskedToRaw[nextValidPosition(start)]);
@@ -123,13 +123,6 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		}
 	}
 
-	private int nextValidPosition(int currentPosition) {
-		while(currentPosition < maskedToRaw.length && maskedToRaw[currentPosition] == -1) {
-			currentPosition++;
-		}
-		return currentPosition;
-	}
-
 	@Override
 	public void afterTextChanged(Editable s) {
 		if(!editingAfter && editingBefore && editingOnChanged) {
@@ -137,10 +130,19 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			setText(makeMaskedText());
 			
 			setSelection(selection);
+			
 			editingBefore = false;
 			editingOnChanged = false;
 			editingAfter = false;
+			ignore = false;
 		}
+	}
+	
+	private int nextValidPosition(int currentPosition) {
+		while(currentPosition < maskedToRaw.length && maskedToRaw[currentPosition] == -1) {
+			currentPosition++;
+		}
+		return currentPosition;
 	}
 	
 	private String makeMaskedText() {
