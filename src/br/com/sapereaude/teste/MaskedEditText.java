@@ -124,7 +124,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	}
 
 	private int nextValidPosition(int currentPosition) {
-		while(maskedToRaw[currentPosition] == -1) {
+		while(currentPosition < maskedToRaw.length && maskedToRaw[currentPosition] == -1) {
 			currentPosition++;
 		}
 		return currentPosition;
