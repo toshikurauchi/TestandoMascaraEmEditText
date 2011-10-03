@@ -46,7 +46,8 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		
 		generatePositionArrays();
 		
-		rawText = completeWithWhitespaces("", mask.length());
+		rawText = "";
+//		completeWithWhitespaces("", mask.length());
 		selection = rawToMasked[0];
 		this.setText(mask.replace(charRepresentation, ' '));
 		initialized = true;
@@ -112,14 +113,21 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			editingOnChanged = true;
 			if(count > 0) {
 				StringRange range = new StringRange();
-				range.setStart(start);
+				range.setStart(maskedToRaw[nextValidPosition(start)]);
 				String addedString = s.subSequence(start, start + count).toString();
 				rawText = range.addToString(rawText, clear(addedString));
 				if(initialized) {
-					selection = maskedToRaw[start + count] + 1;
+					selection = nextValidPosition(start + count);
 				}
 			}
 		}
+	}
+
+	private int nextValidPosition(int currentPosition) {
+		while(maskedToRaw[currentPosition] == -1) {
+			currentPosition++;
+		}
+		return currentPosition;
 	}
 
 	@Override

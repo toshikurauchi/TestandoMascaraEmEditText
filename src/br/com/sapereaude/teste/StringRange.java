@@ -29,11 +29,11 @@ public class StringRange {
 		String firstPart = "";
 		String lastPart = "";
 		
-		if(start - 1 > 0) {
-			firstPart = string.substring(0, start - 1);
+		if(start > 0) {
+			firstPart = string.substring(0, start);
 		}
-		if(end < string.length() - 1) {
-			lastPart = string.substring(end, string.length() - 1);
+		if(end >= 0 && end < string.length()) {
+			lastPart = string.substring(end, string.length());
 		}
 		return firstPart.concat(lastPart);
 	}
@@ -42,11 +42,11 @@ public class StringRange {
 		String firstPart = "";
 		String lastPart = "";
 		
-		if(start - 1 > 0) {
-			firstPart = string.substring(0, start - 1);
+		if(start > 0) {
+			firstPart = string.substring(0, start);
 		}
-		if(start < string.length() - 1) {
-			lastPart = string.substring(start, string.length() - 1);
+		if(start >= 0 && start < string.length()) {
+			lastPart = string.substring(start, string.length());
 		}
 		return firstPart.concat(what).concat(lastPart);		
 	}
