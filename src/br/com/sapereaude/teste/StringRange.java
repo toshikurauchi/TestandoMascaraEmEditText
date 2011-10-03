@@ -29,7 +29,7 @@ public class StringRange {
 		String firstPart = "";
 		String lastPart = "";
 		
-		if(start > 0) {
+		if(start > 0 && start <= string.length()) {
 			firstPart = string.substring(0, start);
 		}
 		if(end >= 0 && end < string.length()) {
