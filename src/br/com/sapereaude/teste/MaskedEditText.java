@@ -13,7 +13,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	private String mask;
 	private char charRepresentation;
 	private int[] rawToMask;
-	private String rawText;
+	private RawText rawText;
 	private boolean editingBefore;
 	private boolean editingOnChanged;
 	private boolean editingAfter;
@@ -48,7 +48,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		
 		generatePositionArrays();
 		
-		rawText = "";
+		rawText = new RawText();
 		selection = rawToMask[0];
 		this.setText(mask.replace(charRepresentation, ' '));
 		ignore = false;
@@ -110,9 +110,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			if(start >= mask.length()) {
 				ignore = true;
 			}
-			StringRange range = calculateRange(start, start + count);
+			Range range = calculateRange(start, start + count);
 			if(range.getStart() != -1) {
-				rawText = range.subtractFromString(rawText);
+				rawText.subtractFromString(range);
 			}
 			if(count > 0) {
 				selection = previousValidPosition(start);
@@ -128,10 +128,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 				return;
 			}
 			if(count > 0) {
-				StringRange range = new StringRange();
-				range.setStart(maskToRaw[nextValidPosition(start)]);
+				int startingPosition = maskToRaw[nextValidPosition(start)];
 				String addedString = s.subSequence(start, start + count).toString();
-				rawText = range.addToString(rawText, clear(addedString), maskToRaw[previousValidPosition(mask.length() - 1)] + 1);
+				rawText.addToString(clear(addedString), startingPosition, maskToRaw[previousValidPosition(mask.length() - 1)] + 1);
 				if(initialized) {
 					selection = nextValidPosition(start + count);
 				}
@@ -184,8 +183,8 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		return new String(maskedText);
 	}
 
-	private StringRange calculateRange(int start, int end) {
-		StringRange range = new StringRange();
+	private Range calculateRange(int start, int end) {
+		Range range = new Range();
 		for(int i = start; i <= end && i < mask.length(); i++) {
 			if(maskToRaw[i] != -1) {
 				if(range.getStart() == -1) {
