@@ -22,6 +22,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	private int selection;
 	private boolean initialized;
 	private boolean ignore;
+	protected int maxRawLength;
 	
 //	public MaskedEditText(Context context) {
 //		super(context);
@@ -52,14 +53,22 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		selection = rawToMask[0];
 		this.setText(mask.replace(charRepresentation, ' '));
 		ignore = false;
+		maxRawLength = maskToRaw[previousValidPosition(mask.length() - 1)] + 1;
 		initialized = true;
 		
 		setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus()) {
-					MaskedEditText.this.setSelection(nextValidPosition(rawToMask[rawText.length()]));
+					MaskedEditText.this.setSelection(lastValidPosition());
 				}
+			}
+
+			private int lastValidPosition() {
+				if(rawText.length() == maxRawLength) {
+					return rawToMask[rawText.length() - 1] + 1;
+				}
+				return nextValidPosition(rawToMask[rawText.length()]);
 			}
 		});
 	}
@@ -130,7 +139,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			if(count > 0) {
 				int startingPosition = maskToRaw[nextValidPosition(start)];
 				String addedString = s.subSequence(start, start + count).toString();
-				rawText.addToString(clear(addedString), startingPosition, maskToRaw[previousValidPosition(mask.length() - 1)] + 1);
+				count = rawText.addToString(clear(addedString), startingPosition, maxRawLength);
 				if(initialized) {
 					selection = nextValidPosition(start + count);
 				}
