@@ -63,13 +63,6 @@ public class MaskedEditText extends EditText implements TextWatcher {
 					MaskedEditText.this.setSelection(lastValidPosition());
 				}
 			}
-
-			private int lastValidPosition() {
-				if(rawText.length() == maxRawLength) {
-					return rawToMask[rawText.length() - 1] + 1;
-				}
-				return nextValidPosition(rawToMask[rawText.length()]);
-			}
 		});
 	}
 
@@ -162,6 +155,20 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		}
 	}
 	
+	@Override
+	protected void onSelectionChanged(int selStart, int selEnd) {
+		if(initialized) {
+			if(selStart > lastValidPosition()) {
+				selStart = lastValidPosition();
+			} 
+			if(selEnd > lastValidPosition()) {
+				selEnd = lastValidPosition();
+			}
+			setSelection(selStart, selEnd);
+		}
+		super.onSelectionChanged(selStart, selEnd);
+	}
+	
 	private int nextValidPosition(int currentPosition) {
 		while(currentPosition < maskToRaw.length && maskToRaw[currentPosition] == -1) {
 			currentPosition++;
@@ -177,6 +184,13 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			}
 		}
 		return currentPosition;
+	}
+	
+	private int lastValidPosition() {
+		if(rawText.length() == maxRawLength) {
+			return rawToMask[rawText.length() - 1] + 1;
+		}
+		return nextValidPosition(rawToMask[rawText.length()]);
 	}
 	
 	private String makeMaskedText() {
