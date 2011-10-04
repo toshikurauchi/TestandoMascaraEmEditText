@@ -158,17 +158,22 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	@Override
 	protected void onSelectionChanged(int selStart, int selEnd) {
 		if(initialized) {
-			if(selStart > lastValidPosition()) {
-				selStart = lastValidPosition();
-			} 
-			if(selEnd > lastValidPosition()) {
-				selEnd = lastValidPosition();
-			}
+			selStart = fixSelection(selStart);
+			selEnd = fixSelection(selEnd);
 			setSelection(selStart, selEnd);
 		}
 		super.onSelectionChanged(selStart, selEnd);
 	}
 	
+	private int fixSelection(int selection) {
+		if(selection > lastValidPosition()) {
+			return lastValidPosition();
+		} 
+		else {
+			return nextValidPosition(selection);
+		}
+	}
+
 	private int nextValidPosition(int currentPosition) {
 		while(currentPosition < maskToRaw.length && maskToRaw[currentPosition] == -1) {
 			currentPosition++;
