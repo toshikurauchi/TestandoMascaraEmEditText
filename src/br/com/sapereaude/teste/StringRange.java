@@ -38,7 +38,7 @@ public class StringRange {
 		return firstPart.concat(lastPart);
 	}
 
-	public String addToString(String string, String what) {
+	public String addToString(String string, String what, int maxLength) {
 		String firstPart = "";
 		String lastPart = "";
 		
@@ -47,6 +47,9 @@ public class StringRange {
 		}
 		if(start >= 0 && start < string.length()) {
 			lastPart = string.substring(start, string.length());
+		}
+		if(string.length() + what.length() > maxLength) {
+			what = what.substring(0, maxLength - string.length());
 		}
 		return firstPart.concat(what).concat(lastPart);		
 	}

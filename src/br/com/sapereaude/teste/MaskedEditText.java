@@ -12,12 +12,12 @@ public class MaskedEditText extends EditText implements TextWatcher {
 
 	private String mask;
 	private char charRepresentation;
-	private int[] rawToMasked;
+	private int[] rawToMask;
 	private String rawText;
 	private boolean editingBefore;
 	private boolean editingOnChanged;
 	private boolean editingAfter;
-	private int[] maskedToRaw;
+	private int[] maskToRaw;
 	private char[] charsInMask;
 	private int selection;
 	private boolean initialized;
@@ -49,7 +49,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		generatePositionArrays();
 		
 		rawText = "";
-		selection = rawToMasked[0];
+		selection = rawToMask[0];
 		this.setText(mask.replace(charRepresentation, ' '));
 		ignore = false;
 		initialized = true;
@@ -58,7 +58,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus()) {
-					MaskedEditText.this.setSelection(nextValidPosition(rawToMasked[rawText.length()]));
+					MaskedEditText.this.setSelection(nextValidPosition(rawToMask[rawText.length()]));
 				}
 			}
 		});
@@ -66,7 +66,7 @@ public class MaskedEditText extends EditText implements TextWatcher {
 
 	private void generatePositionArrays() {
 		int[] aux = new int[mask.length()];
-		maskedToRaw = new int[mask.length()];
+		maskToRaw = new int[mask.length()];
 		String charsInMaskAux = "";
 		
 		int charIndex = 0;
@@ -74,14 +74,14 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			char currentChar = mask.charAt(i);
 			if(currentChar == charRepresentation) {
 				aux[charIndex] = i;
-				maskedToRaw[i] = charIndex++;
+				maskToRaw[i] = charIndex++;
 			}
 			else {
 				String charAsString = Character.toString(currentChar);
 				if(!charsInMaskAux.contains(charAsString)) {
 					charsInMaskAux = charsInMaskAux.concat(charAsString);
 				}
-				maskedToRaw[i] = -1;
+				maskToRaw[i] = -1;
 			}
 		}
 		if(charsInMaskAux.indexOf(' ') < 0) {
@@ -89,9 +89,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 		}
 		charsInMask = charsInMaskAux.toCharArray();
 		
-		rawToMasked = new int[charIndex];
+		rawToMask = new int[charIndex];
 		for (int i = 0; i < charIndex; i++) {
-			rawToMasked[i] = aux[i];
+			rawToMask[i] = aux[i];
 		}
 	}
 	
@@ -129,9 +129,9 @@ public class MaskedEditText extends EditText implements TextWatcher {
 			}
 			if(count > 0) {
 				StringRange range = new StringRange();
-				range.setStart(maskedToRaw[nextValidPosition(start)]);
+				range.setStart(maskToRaw[nextValidPosition(start)]);
 				String addedString = s.subSequence(start, start + count).toString();
-				rawText = range.addToString(rawText, clear(addedString));
+				rawText = range.addToString(rawText, clear(addedString), maskToRaw[previousValidPosition(mask.length() - 1)] + 1);
 				if(initialized) {
 					selection = nextValidPosition(start + count);
 				}
@@ -155,14 +155,14 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	}
 	
 	private int nextValidPosition(int currentPosition) {
-		while(currentPosition < maskedToRaw.length && maskedToRaw[currentPosition] == -1) {
+		while(currentPosition < maskToRaw.length && maskToRaw[currentPosition] == -1) {
 			currentPosition++;
 		}
 		return currentPosition;
 	}
 	
 	private int previousValidPosition(int currentPosition) {
-		while(currentPosition >= 0 && maskedToRaw[currentPosition] == -1) {
+		while(currentPosition >= 0 && maskToRaw[currentPosition] == -1) {
 			currentPosition--;
 			if(currentPosition < 0) {
 				return nextValidPosition(0);
@@ -173,12 +173,12 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	
 	private String makeMaskedText() {
 		char[] maskedText = mask.replace(charRepresentation, ' ').toCharArray();
-		for(int i = 0; i < rawToMasked.length; i++) {
+		for(int i = 0; i < rawToMask.length; i++) {
 			if(i < rawText.length()) {
-				maskedText[rawToMasked[i]] = rawText.charAt(i);
+				maskedText[rawToMask[i]] = rawText.charAt(i);
 			}
 			else {
-				maskedText[rawToMasked[i]] = ' ';
+				maskedText[rawToMask[i]] = ' ';
 			}
 		}
 		return new String(maskedText);
@@ -187,11 +187,11 @@ public class MaskedEditText extends EditText implements TextWatcher {
 	private StringRange calculateRange(int start, int end) {
 		StringRange range = new StringRange();
 		for(int i = start; i <= end && i < mask.length(); i++) {
-			if(maskedToRaw[i] != -1) {
+			if(maskToRaw[i] != -1) {
 				if(range.getStart() == -1) {
-					range.setStart(maskedToRaw[i]);
+					range.setStart(maskToRaw[i]);
 				}
-				range.setEnd(maskedToRaw[i]);
+				range.setEnd(maskToRaw[i]);
 			}
 		}
 		if(end == mask.length()) {
