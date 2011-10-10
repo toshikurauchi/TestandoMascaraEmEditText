@@ -5,17 +5,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<br.com.sapereaude.teste.MaskedEditText
+<br.com.sapereaude.maskedEditText.MaskedEditText
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     custom_edit:mask="(cc) cccc-cccc"
     custom_edit:char_representation="c"
 	android:id="@+id/edit"
     />
-<br.com.sapereaude.teste.MaskedEditText
+<br.com.sapereaude.maskedEditText.MaskedEditText
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     custom_edit:mask="###.###.###-##"
+    android:inputType="number"
 	android:id="@+id/edit"
     />
 </LinearLayout>

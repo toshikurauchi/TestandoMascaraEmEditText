@@ -9,7 +9,5 @@ public class TestandoMascaraEmEditTextActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
-        MaskedEditText edit = (MaskedEditText) findViewById(R.id.edit);
     }
 }
